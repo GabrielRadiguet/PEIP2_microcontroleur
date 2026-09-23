@@ -1,82 +1,50 @@
-/* mbed Microcontroller Library
- * Copyright (c) 2019 ARM Limited
- * SPDX-License-Identifier: Apache-2.0
- */
-
 #include "mbed.h"
-#include "platform/mbed_thread.h"
-#include "LM75B.h"
-#include "C12832.h"
 
-AnalogIn pot1(p19);
-AnalogIn pot2(p20);
+//Frequences des notes en gamme 3
+#define DO  262.0
+#define DOd 277.0
+#define RE  294.0
+#define REd 311.0
+#define MI 330.0
+#define FA  349.0
+#define FAd 370.0
+#define SOL  392.0
+#define SOLd 415.0
+#define LA  440.0
+#define LAd 466.0
+#define SI  494.0
+float freq_notes[7]      = {DO, RE,  MI, FA, SOL, LA, SI};
+float azerty2notes[26]      = {DO, 4*DO, 2*LAd, 2*DO, RE, 2*DOd, 2*RE, 2*REd, SOL, 2*MI, 2*FA, 2*FAd, 2*SOL, 4*DOd, SOLd, LA, LAd, REd, SI, MI, FAd, 2*SI, 2*SOLd, 2*LA, FA, DOd} ;
 
-LM75B term(p28, p27);
-C12832 LCD(p5, p7, p6, p8, p11);
+/*A : DO
+Z : DOd
+E : RE
+R : REd
+T : MI
+Y : FA
+U : FAd
+I : SOL
+O : SOLd
+P LA
+Q LAd
+S SI
+D 2*DO
+F 2*DOd
+G 2*RE
+H 2*REd
+J 2*MI
+K 2*FA
+L 2*FAd
+M 2*SOL
+W 2*SOLd
+X 2*LA
+C 2*LAd
+V 2*SI
+B 4*DO
+N 4*DOd*/
 
-DigitalOut led1(LED1);
-DigitalOut led2(LED2);
-DigitalOut led3(LED3);
-DigitalOut led4(LED4);
+float volume;
+int gamme;
+int note;
 
-DigitalOut leds[4] = {led1, led2, led3, led4};
-
-PwmOut R(p23);
-PwmOut G(p24);
-PwmOut B(p25);
-
-void ResetLeds(){
-    for(int i = 0; i < 4; i++) leds[i] = 0;
-}
-
-void DisplayIntLeds(int i){
-    int j = 3;
-    while(j >= 0){
-        leds[j] = (i & 1);
-        i >>= 1;
-        j--;
-    }
-}
-
-int patern[5] = {0, 1, 3, 7, 15};
-
-int AnalogIn2Index(float v, int n){
-    return (int)(v * n);
-}
-
-float clamp(float x, float mini, float maxi){
-    return min(max(mini, x), maxi);
-}
-
-int main()
-{
-    float temp;
-    float pot1v;
-    float pot2v;
-
-    float Rv, Gv, Bv;
-
-    while(true){
-        temp = term.temp();
-        pot1v = pot1.read();
-        pot2v = pot2.read();
-
-        DisplayIntLeds(patern[AnalogIn2Index(pot1v, 5)]);
-
-        Rv = clamp(pot2v - 0.5, 0, 1);
-        Gv = clamp(0.5 - abs(pot2v - 0.5), 0, 1);
-        Bv = clamp(0.5 - pot2v, 0, 1);
-        R = 1 - Rv;
-        G = 1 - Gv;
-        B = 1 - Bv;
-
-        LCD.locate(0, 0);
-        LCD.printf("temp : %f %f", temp, Rv);
-
-        LCD.locate(0, LCD.height()/3);
-        LCD.printf("pot1 : %f %f", pot1v, Gv);
-
-        LCD.locate(0, 2 * LCD.height()/3);
-        LCD.printf("pot2 : %f %f", pot2v, Bv);
-    }
-}
+ }
