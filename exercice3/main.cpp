@@ -1,23 +1,50 @@
-/* mbed Microcontroller Library
- * Copyright (c) 2019 ARM Limited
- * SPDX-License-Identifier: Apache-2.0
- */
-
 #include "mbed.h"
-#include "platform/mbed_thread.h"
 
+//Frequences des notes en gamme 3
+#define DO  262.0
+#define DOd 277.0
+#define RE  294.0
+#define REd 311.0
+#define MI 330.0
+#define FA  349.0
+#define FAd 370.0
+#define SOL  392.0
+#define SOLd 415.0
+#define LA  440.0
+#define LAd 466.0
+#define SI  494.0
+float freq_notes[7]      = {DO, RE,  MI, FA, SOL, LA, SI};
+float azerty2notes[26]      = {DO, 4*DO, 2*LAd, 2*DO, RE, 2*DOd, 2*RE, 2*REd, SOL, 2*MI, 2*FA, 2*FAd, 2*SOL, 4*DOd, SOLd, LA, LAd, REd, SI, MI, FAd, 2*SI, 2*SOLd, 2*LA, FA, DOd} ;
 
-// Blinking rate in milliseconds
-#define BLINKING_RATE_MS                                                    500
+/*A : DO
+Z : DOd
+E : RE
+R : REd
+T : MI
+Y : FA
+U : FAd
+I : SOL
+O : SOLd
+P LA
+Q LAd
+S SI
+D 2*DO
+F 2*DOd
+G 2*RE
+H 2*REd
+J 2*MI
+K 2*FA
+L 2*FAd
+M 2*SOL
+W 2*SOLd
+X 2*LA
+C 2*LAd
+V 2*SI
+B 4*DO
+N 4*DOd*/
 
+float volume;
+int gamme;
+int note;
 
-int main()
-{
-    // Initialise the digital pin LED1 as an output
-    DigitalOut led(LED1);
-
-    while (true) {
-        led = !led;
-        thread_sleep_for(BLINKING_RATE_MS);
-    }
-}
+ }
