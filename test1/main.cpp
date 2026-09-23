@@ -21,6 +21,10 @@ DigitalOut led4(LED4);
 
 DigitalOut leds[4] = {led1, led2, led3, led4};
 
+PwmOut R(p23);
+PwmOut G(p24);
+PwmOut B(p25);
+
 void ResetLeds(){
     for(int i = 0; i < 4; i++) leds[i] = 0;
 }
@@ -40,26 +44,39 @@ int AnalogIn2Index(float v, int n){
     return (int)(v * n);
 }
 
+float clamp(float x, float mini, float maxi){
+    return min(max(mini, x), maxi);
+}
+
 int main()
 {
     float temp;
     float pot1v;
     float pot2v;
 
+    float Rv, Gv, Bv;
+
     while(true){
         temp = term.temp();
         pot1v = pot1.read();
         pot2v = pot2.read();
 
+        DisplayIntLeds(patern[AnalogIn2Index(pot1v, 5)]);
+
+        Rv = clamp(pot2v - 0.5, 0, 1);
+        Gv = clamp(0.5 - abs(pot2v - 0.5), 0, 1);
+        Bv = clamp(0.5 - pot2v, 0, 1);
+        R = 1 - Rv;
+        G = 1 - Gv;
+        B = 1 - Bv;
+
         LCD.locate(0, 0);
-        LCD.printf("temp : %f", temp);
+        LCD.printf("temp : %f %f", temp, Rv);
 
         LCD.locate(0, LCD.height()/3);
-        LCD.printf("pot1 : %f %d", pot1v, AnalogIn2Index(pot1v, 5));
+        LCD.printf("pot1 : %f %f", pot1v, Gv);
 
         LCD.locate(0, 2 * LCD.height()/3);
-        LCD.printf("pot2 : %f", pot2v);
-
-        DisplayIntLeds(patern[AnalogIn2Index(pot1v, 5)]);
+        LCD.printf("pot2 : %f %f", pot2v, Bv);
     }
 }
