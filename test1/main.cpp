@@ -116,6 +116,16 @@ bool game_tick(){
 
 }
 
+void endscreen(){
+    LCD.cls();
+    LCD.locate(2,1);
+    LCD.printf("Game Over");
+    while(true){
+        wait_us(500000);
+    }
+}
+
+
 int main()
 {
     reset_game_state();
@@ -128,4 +138,5 @@ int main()
         LCD.copy_to_lcd();
         wait_us(500000);
     }
+    endscreen()
 }
