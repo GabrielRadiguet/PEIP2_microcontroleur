@@ -1,4 +1,7 @@
 #include "mbed.h"
+#include <cstdio>
+#include "LM75B.h"
+#include "C12832.h"
 
 //Frequences des notes en gamme 3
 #define DO  262.0
@@ -47,4 +50,39 @@ float volume;
 int gamme;
 int note;
 
- }
+PwmOut Speaker(p26);
+AnalogIn pot1(p19);
+AnalogIn pot2(p20);
+C12832 LCD(p5, p7, p6, p8, p11);
+
+void PlayNote(float freq, float vol){
+    Speaker.period(1/freq);
+    Speaker=vol;
+}
+
+int AnalogIn2Index(float v, int n){
+    return (int) n * v;
+}
+
+int main()
+{
+    float pot1v;
+    float pot2v;
+    PlayNote(DO, 0.9);
+    int n;
+    while(true){
+        pot1v = pot1.read();
+        pot2v = pot2.read();
+        
+        n = AnalogIn2Index(pot1v, 7);
+
+        PlayNote(freq_notes[n], pot2v);
+        
+        LCD.locate(0, 0);
+        LCD.printf("pot1 : %d", n + 1);
+
+        LCD.locate(0, LCD.height()/3);
+        LCD.printf("pot1 : %f", pot2v);
+    }
+    printf("test");
+}
