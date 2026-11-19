@@ -19,33 +19,6 @@
 float freq_notes[7]      = {DO, RE,  MI, FA, SOL, LA, SI};
 float azerty2notes[26]      = {DO, 4*DO, 2*LAd, 2*DO, RE, 2*DOd, 2*RE, 2*REd, SOL, 2*MI, 2*FA, 2*FAd, 2*SOL, 4*DOd, SOLd, LA, LAd, REd, SI, MI, FAd, 2*SI, 2*SOLd, 2*LA, FA, DOd} ;
 
-/*A : DO
-Z : DOd
-E : RE
-R : REd
-T : MI
-Y : FA
-U : FAd
-I : SOL
-O : SOLd
-P LA
-Q LAd
-S SI
-D 2*DO
-F 2*DOd
-G 2*RE
-H 2*REd
-J 2*MI
-K 2*FA
-L 2*FAd
-M 2*SOL
-W 2*SOLd
-X 2*LA
-C 2*LAd
-V 2*SI
-B 4*DO
-N 4*DOd*/
-
 float volume;
 int gamme;
 int note;
@@ -65,6 +38,8 @@ int AnalogIn2Index(float v, int n){
 }
 
 
+
+
 DigitalIn Down(p12);
 DigitalIn Up(p15);
 DigitalIn Left(p13);
@@ -73,49 +48,84 @@ DigitalIn Right(p16);
 #define x_max 32
 #define y_max 8
 int game_state[x_max][y_max];
+int game_state_save[x_max][y_max];
+int tete[2] = {0,0};
+int queue[2] = {0,0};
 
 void reset_game_state(){
     for (int i = 0; i < x_max; i++) {
         for (int j = 0; j < y_max; j++) {
             game_state[i][j] = 0;
+            game_state_save[i][j] = 0;
         }
     }
 }
 
-void queue()
-{
-    
-}
-
-void deplacements()
-{
-
-}
-
 void print_screen()
 {
-    LCD.pixel(1,1,1);
+    for (int i = 0; i < x_max; i++) {
+        for (int j = 0; j < y_max; j++) {
+            LCD.pixel(i,j,1);
+        }
+    }
+
+    //LCD.fillrect(0, 0, 10, 10, 1);
+}
+
+void deplacements(int move[2])
+{
+    if(Down == 1){
+        move[0] = 0;
+        move[1] = 1;
+    }else if(Up == 1){
+        move[0] = 0;
+        move[1] = -1;
+    }else if(Right == 1){
+        move[0] = 0;
+        move[1] = 1;   
+    }else{
+        move[0] = 0;
+        move[1] = -1;      
+    }
+}
+
+void reduce(){
+    for (int i = 0; i < x_max; i++) {
+        for (int j = 0; j < y_max; j++) {
+            if(game_state[i][j] > 0 && game_state[i][j] < 255){
+                game_state[i][j] -= 1;
+            }
+        }
+    }
+}
+
+bool game_tick(){
+    int move[2] = {0,0};
+    deplacements(move);
+
+    if((tete[0] + move[0] < 0) || (tete[0] + move[0] >= x_max) ||
+    (tete[1] + move[1] < 0) || (tete[1] + move[1] >= y_max)){
+        return true;
+    }
+    
+    bool pomme = (game_state[tete[0] + move[0]][tete[1] + move[1]] == 255);
+    game_state[tete[0] + move[0]][tete[1] + move[1]] = game_state[tete[0]][tete[1]] + 1;
+
+    tete[0] += move[0];
+    tete[1] += move[1];
+
 }
 
 int main()
 {
-    float pot1v;
-    float pot2v;
-    PlayNote(DO, 0.9);
-    int n;
+    reset_game_state();
+    print_screen();
+
     while(true){
-        pot1v = pot1.read();
-        pot2v = pot2.read();
-        
-        n = AnalogIn2Index(pot1v, 7);
-
-        PlayNote(freq_notes[n], pot2v);
-        
-        LCD.locate(0, 0);
-        LCD.printf("pot1 : %d", n + 1);
-
-        LCD.locate(0, LCD.height()/3);
-        LCD.printf("pot1 : %f", pot2v);
+        if(game_tick()){
+            break;
+        }
+        LCD.copy_to_lcd();
+        wait_us(500000);
     }
-    printf("test");
 }
