@@ -64,6 +64,39 @@ int AnalogIn2Index(float v, int n){
     return (int) n * v;
 }
 
+
+DigitalIn Down(p12);
+DigitalIn Up(p15);
+DigitalIn Left(p13);
+DigitalIn Right(p16);
+
+#define x_max 32
+#define y_max 8
+int game_state[x_max][y_max];
+
+void reset_game_state(){
+    for (int i = 0; i < x_max; i++) {
+        for (int j = 0; j < y_max; j++) {
+            game_state[i][j] = 0;
+        }
+    }
+}
+
+void queue()
+{
+    
+}
+
+void deplacements()
+{
+
+}
+
+void print_screen()
+{
+    LCD.pixel(1,1,1);
+}
+
 int main()
 {
     float pot1v;
@@ -85,53 +118,4 @@ int main()
         LCD.printf("pot1 : %f", pot2v);
     }
     printf("test");
-}
-
-
-#include "mbed.h"
-#include "C12832.h"
-C12832 LCD(p5, p7, p6, p8, p11);
-
-DigitalIn Down(p12);
-DigitalIn Up(p15);
-DigitalIn Left(p13);
-DigitalIn Right(p16);
-
-int x_max = 32;
-int y_max = 8;
-int array[x_max][y_max];
-array[i][j]=0
-array[10][2]=1
-
-void queue()
-{
-    
-}
-
-void deplacements()
-{
-
-}
-
-void print_screen(int x, int y, bool state)
-{
-    lcd.pixel(x, y, state);
-}
-
-void print_array(int array[x_max][y_max])
-{
-    for (int i = 0; i < x_max; i++)
-    {
-        for (int j = 0; j < y_max; j++)
-        {
-            print_screen(i, j, array[i][j]);
-        }
-    }
-}
-
-
-
-int main()
-{
-    
 }
